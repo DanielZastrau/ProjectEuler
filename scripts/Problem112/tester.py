@@ -1,4 +1,4 @@
-from Problem112_BouncyNumbers import is_increasing_number, is_decreasing_number, is_bouncy_number, amount_of_bouncy_numbers_below, \
+from main import is_increasing_number, is_decreasing_number, is_bouncy_number, amount_of_bouncy_numbers_below, \
     when_does_proportion_of_bouncy_numbers_reach
 
 failed_tests: list[str] = []
