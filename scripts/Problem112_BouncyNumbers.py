@@ -1,3 +1,5 @@
+"""https://projecteuler.net/problem=112"""
+
 def is_increasing_number(number: int) -> bool:
 
     string = str(number)
