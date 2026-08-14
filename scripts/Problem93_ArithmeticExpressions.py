@@ -1,154 +1,212 @@
-"""https://projecteuler.net/problem=93"""
+"""https://projecteuler.net/problem=93
 
-import itertools
-
-def evaluate(sequence: list[str]) -> float:
-    """evaluates a string 4 x (3 + 1 / 2).
-    
-    Bracket before anything
-    division and multiplication before sums and differences."""
-
-    # ! Evaluates any bracketed term
-    if '(' in sequence:
-        for i, char in enumerate(sequence):
-            if char == '(':
-
-                #! Find closing bracket
-                last_index: int = i + 1
-                for j, charr in enumerate(sequence[i:]):
-
-                    if charr == ')':
-                        last_index = i + j
-                bracket_value = evaluate(sequence[i + 1: last_index])
-                sequence = sequence[: i] + [str(bracket_value)] + sequence[last_index + 1 : ]
-                break
-
-    # ! Evaluates multiplications and divisions left to right
-    for _ in range(2):
-        for i, e in enumerate(sequence):
-
-            if e == 'x' or e == '/':
-                if e == 'x':
-                    v = float(sequence[i-1]) * float(sequence[i+1])
-
-                else:    # e == '/':
-
-                    if float(sequence[i+1]) == 0:
-                        return -10_000
+    [14.08.26]
+        Searchspace=10    ~  18 seconds
+        Searchspace=20    ~ 460 seconds
+            Calculating all possible combinations of
+                    numbers in the searchspace
+                    orders of those numbers
+                    choices of operators
+                    positions of brackets
+                    then constructing the term
+                    then evaluating it
                     
-                    v = float(sequence[i-1]) / float(sequence[i+1])
+    [14.08.26]
+        Searchspace=10    ~   0.09  seconds    improvement factor=200x
+        Searchspace=20    ~   2.16  seconds    improvement factor=212x
+        Searchspace=30    ~  13.67  seconds
+        Searchspace=40    ~  48.80  seconds
+        Searchspace=50    ~ 132.34  seconds
+        Searchspace=60    ~ 234.67  seconds
+            Calculating all possible combinations of
+                    numbers in the searchspace
+                    orders of those numbers
+                    orders of operators
+                    and then just evaluating left to right
+            Also cutting out the printing every new n3.
+                    
+            This acknowledges that it would compute each
+            possible combination with the brackets
+    
 
-                sequence = sequence[ : i-1] + [str(v)] + sequence[ i+2 : ]
+            Different length calculation at the end.
+            Now, explicitely going up the numbers and breaking
+                    on the first, which breaks.
+            Previously,     diffs = [l[i] - l[i - 1] for i in range(1, len(l))]
+                            l = list(itertools.filterfalse(lambda x: x != 1, diffs))
+                    This was wrong, an unbroken sequence 2 to n would have also counted.
+            
+
+            This current left to right solving works for all operations except for divisions.
+                    Also it does not work for multiplication (a + b) x (c + d) has no order
+                    in which it translates to pure left to right solving.
+
+    [14.08.26]
+        Added bracketing in again, doing all cases manually.
+        Moved calculation of brackets and operator orders outside of main loops,
+                to avoid recalculating the same static entity millions of times.
+
+        Searchspace=10    ~  16.18  seconds    >    1 2 5 8 51
+        Searchspace=20    ~ 495.08  seconds    >    1 2 5 8 51
+
+        SOLVED
+    """
+
+import argparse
+import math
+import itertools as it
+import time
+
+def disjoint(pair: tuple[tuple[int, int], tuple[int, int]]) -> bool:
+
+    opening_pos_2 = pair[1][0]
+    closing_pos_1 = pair[0][1]
+
+    #! disjoint?
+    if closing_pos_1 < opening_pos_2:
+        return True
+
+    return False
+
+
+def contained(pair: tuple[tuple[int, int], tuple[int, int]]) -> bool:
+
+    opening_pos_1 = pair[0][0]
+    opening_pos_2 = pair[1][0]
+
+    closing_pos_1 = pair[0][1]
+    closing_pos_2 = pair[1][1]
+
+    #! not equal
+    if opening_pos_1 == opening_pos_2 and closing_pos_1 == closing_pos_2:
+        return False
+
+    #! contained?
+    if opening_pos_2 >= opening_pos_1 and closing_pos_2 <= closing_pos_1:
+        return True
+
+    return False
+
+def evaluate(sequence: list[float], operators: list[str]) -> float:
+
+    count_point_operations = operators.count('*') + operators.count('/')
+
+    for _ in range(count_point_operations):
+        for i, op in enumerate(operators):
+            if op in ['*', '/']:
+                e1 = sequence[i]
+                e2 = sequence[i + 1]
+
+                if op == '*':
+                    value = e1 * e2
+
+                else:    # op == '/'
+                    if e2 == 0:
+                        return -10_000
+                    value = e1 / e2
+
+                sequence = sequence[: i] + [value] + sequence[i + 2: ]
+                operators.remove(op)
                 break
 
-    for _ in range(2):
-        for i, e in enumerate(sequence):
+    for _ in range(3 - count_point_operations):
+        for i, op in enumerate(operators):
+            if op in ['+', '-']:
+                e1 = sequence[i]
+                e2 = sequence[i + 1]
 
-            if e == '+' or e == '-':
-                if e == '+':
-                    v = float(sequence[i-1]) + float(sequence[i+1])
+                if op == '+':
+                    value = e1 + e2
 
-                else:    # e == '-':
-                    v = float(sequence[i-1]) - float(sequence[i+1])
+                else:    # op == '-'
+                    value = e1 - e2
 
-                sequence = sequence[ : i-1] + [str(v)] + sequence[ i+2 : ]
+                sequence = sequence[: i] + [value] + sequence[i + 2: ]
+                operators.remove(op)
                 break
+        
+    return sequence[0]
 
-    return float(sequence[0])
+def calculate_sequence_length(n1: int, n2: int, n3: int, n4: int) -> tuple[int, list[float]]:
 
-def calculate_sequence_length(n1: str, n2: str, n3: str, n4: str):
-
-    digits = '0,1,2,3,4,5,6,7,8,9'.split(',')
     numbers = [n1, n2, n3, n4]
-    operators = '+,-,x,/'.split(',')
-    integer_values: set[int] = set()
+    orders_of_numbers = it.permutations(numbers)
 
-    A: list[tuple[int, int]] = []
-    for i in range(3):
-        for j in range(i, 5):
+    integer_values: set[float] = set()
+    for on in orders_of_numbers:
+        for oo in orders_of_operators:
 
-            if j - i == 1 or j - i == 4:
-                continue
+            for bracket in singles:
 
-            A.append((i,j))
-    A = list(itertools.filterfalse(lambda x: x[0] == x[1], A))
+                if bracket == (0, 1):
+                    term1 = evaluate(sequence=[on[0], on[1]], operators=[oo[0]])
+                    n = evaluate(sequence=[term1, on[2], on[3]], operators=[oo[1], oo[2]])
+                    
+                elif bracket == (0, 2):
+                    term1 = evaluate(sequence=[on[0], on[1], on[2]], operators=[oo[0], oo[1]])
+                    n = evaluate(sequence=[term1, on[3]], operators=[oo[2]])
 
-    B = itertools.product(A, A)
-    B = itertools.filterfalse(lambda x: not (x[0][0] <= x[1][0] and x[0][1] >= x[1][1]), B)
-    B = itertools.filterfalse(lambda x: x[0] == x[1], B)
-    B = list(B)
+                elif bracket == (0, 3):
+                    n = evaluate(sequence=list(on), operators=list(oo))
 
-    positions_of_brackets = [()] + A + B
+                elif bracket == (1, 2):
+                    term1 = evaluate(sequence=[on[1], on[2]], operators=[oo[1]])
+                    n = evaluate(sequence=[on[0], term1, on[3]], operators=[oo[0], oo[2]])
 
-    orders_of_numbers = itertools.permutations(numbers)
-    orders_of_operators = list(itertools.product(operators, repeat=3))
+                elif bracket == (1, 3):
+                    term1 = evaluate(sequence=[on[1], on[2], on[3]], operators=[oo[1], oo[2]])
+                    n = evaluate(sequence=[on[0], term1], operators=[oo[0]])
 
-    for order_n in orders_of_numbers:
-        for position_of_brackets in positions_of_brackets:
-            for oo in orders_of_operators:
-                sequence = list(order_n)
+                elif bracket == (2, 3):
+                    term1 = evaluate(sequence=[on[2], on[3]], operators=[oo[2]])
+                    n = evaluate(sequence=[on[0], on[1], term1], operators=[oo[0], oo[1]])
 
-                if position_of_brackets == ():
-                    pass
+            for pair in doubles_disjoint:
+                term1 = evaluate(sequence=[on[0], on[1]], operators=[oo[0]])
+                term2 = evaluate(sequence=[on[2], on[3]], operators=[oo[2]])
+                n = evaluate(sequence=[term1, term2], operators=[oo[1]])
 
-                elif isinstance(position_of_brackets[0], int):
+            for pair in doubles_contained:
+                opening_pos_1 = pair[0][0]
+                opening_pos_2 = pair[1][0]
 
-                    position_of_brackets: tuple[int, int]
+                if opening_pos_1 == 0:    # 0,2
 
-                    first_bracket_index = position_of_brackets[0]
-                    second_bracket_index = position_of_brackets[1]
+                    if opening_pos_2 == 0:    # 0,1
+                        term1 = evaluate(sequence=[on[0], on[1]], operators=[oo[0]])
+                        term2 = evaluate(sequence=[term1, on[2]], operators=[oo[1]])
+                        n = evaluate(sequence=[term2, on[3]], operators=[oo[2]])
 
-                    sequence = sequence[:first_bracket_index] + ['('] + sequence[first_bracket_index:]
-                    sequence = sequence[:second_bracket_index + 1] + [')'] + sequence[second_bracket_index + 1:]
+                    else:    # 1,2
+                        term1 = evaluate(sequence=[on[1], on[2]], operators=[oo[1]])
+                        term2 = evaluate(sequence=[on[0], term1], operators=[oo[0]])
+                        n = evaluate(sequence=[term2, on[3]], operators=[oo[2]])
 
-                elif isinstance(position_of_brackets[0], tuple):
+                else:    # 1,3
 
-                    position_of_brackets: tuple[tuple[int, int], tuple[int, int]]
-                    first_bracket_pair: tuple[int, int]
-                    second_bracket_pair: tuple[int, int]
-                    first_bracket_pair, second_bracket_pair = position_of_brackets
+                    if opening_pos_2 == 1:    # 1,2
+                        term1 = evaluate(sequence=[on[1], on[2]], operators=[oo[1]])
+                        term2 = evaluate(sequence=[term1, on[3]], operators=[oo[2]])
+                        n = evaluate(sequence=[on[0], term2], operators=[oo[0]])
 
-                    bracket_11: int = first_bracket_pair[0]
-                    bracket_12: int = first_bracket_pair[1]
-                    bracket_21: int = second_bracket_pair[0]
-                    bracket_22: int = second_bracket_pair[1]
+                    else:    # 2,3
+                        term1 = evaluate(sequence=[on[2], on[3]], operators=[oo[2]])
+                        term2 = evaluate(sequence=[on[1], term1], operators=[oo[1]])
+                        n = evaluate(sequence=[on[0], term2], operators=[oo[0]])
 
-                    sequence = sequence[:bracket_11] + ['('] + sequence[bracket_11:]
-                    sequence = sequence[:bracket_21 + 1] + ['('] + sequence[bracket_21 + 1:]
-                    sequence = sequence[:bracket_22 + 2] + [')'] + sequence[bracket_22 + 2:]
-                    sequence = sequence[:bracket_12 + 3] + [')'] + sequence[bracket_12 + 3:]
+                #! OPEN
+                integer_values.add(n)
 
-                s = []
-                last_char = ''
-                curr_op_i = 0
-                for char in sequence:
+    if not 1 in integer_values:
+        return 0, [0.0]
 
-                    if last_char in digits and char == '(':
-                        s += [oo[curr_op_i]]
-                        curr_op_i += 1
+    l = sorted(list(it.filterfalse(lambda x: x < 1 or x % 1 != 0, integer_values)))
 
-                    elif last_char == ')' and char in digits:
-                        s += [oo[curr_op_i]]
-                        curr_op_i += 1
+    index = 0
+    while l[index] == index + 1:
+        index += 1
 
-                    elif last_char in digits and char in digits:
-                        s += [oo[curr_op_i]]
-                        curr_op_i += 1
-
-                    s += [char]
-
-                    last_char = char
-
-                n = evaluate(s)
-
-                if n % 1.0 == 0:
-                    integer_values.add(int(n))
-
-    l = sorted(list(itertools.filterfalse(lambda x: x < 1, integer_values)))
-    diffs = [l[i] - l[i - 1] for i in range(1, len(l))]
-    l = list(itertools.filterfalse(lambda x: x != 1, diffs))
-
-    return len(l) + 1
+    return index, l
 
 def find_longest_sequence(searchspace: int):
 
@@ -156,21 +214,43 @@ def find_longest_sequence(searchspace: int):
 
     for n1 in range(1, searchspace):
         for n2 in range(n1 + 1, searchspace):
+            print(n2)
             for n3 in range(n2 + 1, searchspace):
-                print(n1, n2, n3)
                 for n4 in range(n3 + 1, searchspace):
-                    length = calculate_sequence_length(str(n1), str(n2), str(n3), str(n4))
+                    length, l = calculate_sequence_length(n1, n2, n3, n4)
 
                     if length > max_sequence_length:
                         max_sequence_length = length
+                        print(l)
 
                         print('---------------------', max_sequence_length, n1, n2, n3, n4)
 
 if __name__=='__main__':
-    import argparse
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--searchspace', type=int, default=50)
+    parser.add_argument('--test', action='store_true')
     args = parser.parse_args()
 
-    find_longest_sequence(searchspace = args.searchspace)
+    #! Calculate bracket pairings once
+    singles: list[tuple[int, int]] = [(i, j) for i in range(4) for j in range(i + 1, 4)]
+
+    intermediate = singles.copy()
+    intermediate.remove((0,3))
+
+    doubles_disjoint = list(it.filterfalse(lambda x: not disjoint(pair=x), it.product(singles, singles)))
+    doubles_contained = list(it.filterfalse(lambda x: not contained(pair=x), it.product(singles, singles)))
+
+    #! Calculate operator list once
+    operators = '+,-,*,/'.split(',')
+    orders_of_operators = list(it.product(operators, repeat=3))
+
+    if args.test:
+        print(calculate_sequence_length(1, 2, 3, 4))
+
+    else:
+        t = time.time()
+
+        find_longest_sequence(searchspace = args.searchspace)
+
+        print(f'It took {time.time() - t}  seconds')
