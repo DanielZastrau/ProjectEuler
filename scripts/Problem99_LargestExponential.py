@@ -1,4 +1,10 @@
+"""https://projecteuler.net/problem=99
+
+709    0.0009s
+"""
+
 from math import log
+import time
 
 def compare_two_exponentials(base_one: int, exp_one: int, base_two: int, exp_two: int) -> int:
     """Returns 0 or 1. 0 indicates the first one was larger, 1 indicates the second one was larger."""
@@ -14,7 +20,7 @@ def compare_two_exponentials(base_one: int, exp_one: int, base_two: int, exp_two
 def which_is_the_largest_exponential() -> int:
     """Returns the line number of the base, exponential pair with the largest value."""
 
-    with open('./0099_base_exp.txt', 'r', encoding='utf-8') as file:
+    with open('../problem_data/p099_base_exp.txt', 'r', encoding='utf-8') as file:
         data = file.read()
 
     data = data.split('\n')
@@ -38,4 +44,7 @@ def which_is_the_largest_exponential() -> int:
     return largest_line + 1
 
 if __name__=='__main__':
+
+    t = time.time()
     print(which_is_the_largest_exponential())
+    print(time.time() - t)

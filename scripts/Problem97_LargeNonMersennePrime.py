@@ -1,4 +1,7 @@
-"""https://projecteuler.net/problem=97"""
+"""https://projecteuler.net/problem=97
+
+8739992577    1s
+"""
 
 from time import time, sleep
 
