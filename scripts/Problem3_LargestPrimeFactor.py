@@ -1,7 +1,6 @@
 """https://projecteuler.net/problem=3"""
 
 from time import time, sleep
-from Constants import primes_up_to_10to
 
 if __name__=="__main__":
     t = time()
