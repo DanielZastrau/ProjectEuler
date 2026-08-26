@@ -15,22 +15,20 @@ from typing import Iterator
 def main(limit: int = 10**8):
 
     #! Generate the primes up to limit // 2, because we need only those
-    limit_sq = math.isqrt(limit) + 1
     numbers: list[bool] = [True] * ((limit // 2) + 1)
 
     slice_len = (len(numbers) - 4 + 2 - 1) // 2
     numbers[4::2] = [False] * slice_len
 
-    for n in range(3, limit_sq):
+    for n in range(3, math.isqrt(limit) + 1):
         if numbers[n]:
             # only checking the odd multiples, because even multiples are already covered by 2
             # starting at the square, because previous multiples are covered by previous primes
-            start = n**2
-            step = 2*n
+            start, step = n**2, 2*n
             slice_len = (len(numbers) - start + step - 1) // step
-            numbers[n**2::2*n] = [False] * slice_len
+            numbers[start::step] = [False] * slice_len
+            
     primes: list[int] = [index for index in range(2, len(numbers)) if numbers[index]]
-
     print(time.time() - t, len(primes))
 
     #! Two pointer approach
