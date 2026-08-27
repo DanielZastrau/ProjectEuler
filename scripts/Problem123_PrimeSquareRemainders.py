@@ -1,7 +1,7 @@
 """https://projecteuler.net/problem=120
 Aug 26
 
-limit=10**9      7 037     3.943s
+limit=10**9      7 037     0.00693s    correct
 limit=10**10    21 035     0.05108s    correct
 """
 
