@@ -14,12 +14,5 @@ def sum_nums_divisible_by(n: int):
 if __name__=="__main__":
 
     t = time.time()
-
-    limit = 10**9
-
-    s3 = sum_nums_divisible_by(3)
-    s5 = sum_nums_divisible_by(5)
-    s15 = sum_nums_divisible_by(15)
-    print(s3 + s5 - s15)
-
+    print(sum([i for i in range(1, 10**3) if i % 3 == 0 or i % 5 == 0]))
     print(time.time() - t)
