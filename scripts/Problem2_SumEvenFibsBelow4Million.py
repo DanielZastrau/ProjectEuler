@@ -1,10 +1,19 @@
 """https://projecteuler.net/problem=2"""
+import time
 
-if __name__=="__main__":
-    from time import time, sleep
-    
-    t = time()
+def naive_solution(limit: int):
 
+    x = 1
+    y = 1
+    total = 0
+    while y < limit:
+        x, y = y, x + y
+
+        if y % 2 == 0:
+            total += y
+    print(total)
+
+def standard_solution():
     even1 = 0
     even2 = 2
     sum_ = 0
@@ -16,4 +25,8 @@ if __name__=="__main__":
         even1 = tmp
     print(sum_)
 
-    print(time() - t)
+if __name__=="__main__":
+    
+    t = time.time()
+    naive_solution(limit=10**200)
+    print(time.time() - t)
