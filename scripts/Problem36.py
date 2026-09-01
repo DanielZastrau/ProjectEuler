@@ -1,6 +1,6 @@
 import math
 
-def binary_of(n):
+def binary_of(n: int):
     s = ''
     x = n
     h = math.floor(math.log2(n))
@@ -19,19 +19,16 @@ def binary_of(n):
 
     return s
 
-def palindrome(s):
-    if len(s) == 0: return True
-    elif len(s) == 1: return True
-    elif s[0] == s[-1]: return palindrome(s[1:-1])
-    elif s[0] != s[-1]: return False
+def palindrome(s: str) -> bool:
+    return s == s[::-1]
 
-def sum_of_palindromes_less_than(n):
-    P = []
+def sum_of_palindromes_less_than(n: int):
+    palindromes: list[int] = []
     for i in range(1, n):
         if palindrome(str(i)) and palindrome(binary_of(i)):
-            P.append(i)
+            palindromes.append(i)
 
-    return sum(P)
+    return sum(palindromes)
 
 n = 10 ** 6
 #print(palindrome(99))

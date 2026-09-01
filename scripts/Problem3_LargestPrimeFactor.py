@@ -1,18 +1,27 @@
 """https://projecteuler.net/problem=3"""
 
-from time import time, sleep
+import argparse
+import time
+import math
+import itertools as it
+import functools as ft
+import operator as op
+
+from typing import Iterator
+
+import Commons
 
 if __name__=="__main__":
-    t = time()
+    t = time.time()
 
-    Primes = primes_up_to_10to(6)
+    primes = Commons.eratosthenes(limit=10**6)
     # n = 600_851_475_143
-    n = 201_799_977_802
+    n = 91
     m = n
     max_ = 0
     sqroot = n ** 0.5
 
-    for prime in Primes:
+    for prime in primes:
         if prime > sqroot:
             break
         elif n%prime == 0:
@@ -27,4 +36,4 @@ if __name__=="__main__":
     else:
         print(max_)
 
-    print(time() - t)
+    print(time.time() - t)
