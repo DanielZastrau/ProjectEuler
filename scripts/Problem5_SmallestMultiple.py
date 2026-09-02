@@ -1,17 +1,35 @@
 """https://projecteuler.net/problem=5"""
 
-if __name__=="__main__":
-    from time import time, sleep
-    from Constants import primes_up_to_10to
-    from math import log10, floor
+import argparse
+import time
+import math
+import itertools as it
+import functools as ft
+import operator as op
 
-    t = time()
+from typing import Iterator
 
-    limit = 10**6
-    Primes = primes_up_to_10to(int(log10(limit)))
-    res = 1
-    for prime in Primes:
-        res *= prime**(floor(log10(limit) / log10(prime)))
-        
-    print(time() - t)
-    print(res)
+import Commons
+
+def main(n: int):
+
+    primes = Commons.eratosthenes(limit=n)
+
+    #! this is equivalent to computing power such that prime**power = n
+    #! log both sides and take the floor
+    powers = [math.floor(math.log10(n) / math.log10(prime)) for prime in primes]
+
+    m = 1
+    for prime, power in zip(primes, powers):
+        m *= prime**power
+
+    print(m)
+
+if __name__=='__main__':
+
+    parser = argparse.ArgumentParser()
+    args = parser.parse_args()
+
+    t = time.time()
+    main(20)
+    print(time.time() - t)
