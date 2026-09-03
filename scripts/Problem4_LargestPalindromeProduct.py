@@ -1,31 +1,35 @@
 """https://projecteuler.net/problem=4"""
 
-if __name__=="__main__":
-    from time import time, sleep
-    from Package import palindrome
+import argparse
+import time
+import math
+import itertools as it
+import functools as ft
+import operator as op
 
-    t = time()
+from typing import Iterator
 
-    max_ = 0
+import commons
 
-    for a in range(999, 99, -1):
-        if a%11 == 0:
-            for b in range(999, a - 1, -1):
-                number = a * b
-                if number <= max_:
-                    break
+def main():
+    max_ = (0, 0, 0)
 
-                if palindrome(number):
-                    max_ = number
+    for n1 in range(999, 99, -1):
+        for n2 in range(999, n1 - 1, -1):
+            number = n1 * n2
+            if number <= max_[0]:
+                break
 
-        else:
-            for b in range(990, 99, -11):
-                number = a * b
-                if number <= max_:
-                    break
+            if str(number) == str(number)[::-1]:
+                max_ = (number, n1, n2)
 
-                if palindrome(number):
-                    max_ = number
     print(max_)
 
-    print(time() - t)
+if __name__=='__main__':
+
+    parser = argparse.ArgumentParser()
+    args = parser.parse_args()
+
+    t = time.time()
+    main()
+    print(time.time() - t)

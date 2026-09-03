@@ -26,7 +26,7 @@ def main():
     while True:
         next_ = next_tr_num(n)
         if check_pentagonal(next_) and check_hexagonal(n):
-            return next_
+            return n, next_
         
         n += 1
 

@@ -2,8 +2,6 @@
 https://projecteuler.net/problem=56
 """
 
-from Package import cross_sum
-
 def main():
     max_ = 0
     for a in range(1, 100):
