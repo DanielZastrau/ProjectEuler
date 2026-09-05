@@ -4,6 +4,12 @@ import time
 def digitsum(n: int):
     return sum([int(char) for char in str(n)])
 
+def isprime(n: int):
+    for m in range(2, math.isqrt(n) + 1):
+        if n % m == 0:
+            return False
+    return True
+
 def eratosthenes(limit: int) -> list[int]:
     """Calculates all primes up to limit=10**9 in under 45 seconds."""
 
