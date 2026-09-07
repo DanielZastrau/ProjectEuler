@@ -1,5 +1,5 @@
 """https://projecteuler.net/problem=381
-Sep 2026"""
+Sep 2026 ~ 4 hours"""
 
 import argparse
 import time
@@ -12,14 +12,29 @@ from typing import Iterator
 
 import commons
 
-@ft.cache
-def factorial(n: int) -> int:
-    if n == 0:
-        return 1
-    return n * factorial(n - 1)
+def modular_inverse(n: int, p: int) -> int:
+    """Modified extended Euler algorithm"""
+    t, new_t = 0, 1
+    r, new_r = p, n
+
+    while new_r != 0:
+        q = r // new_r
+        t, new_t = new_t, t - q * new_t
+        r, new_r = new_r, r - q * new_r
+
+    if r > 1:
+        return -1
+    if t < 0:
+        t = t + p
+
+    return t
 
 def expression(p: int) -> int:
-    return sum([factorial(p - i) for i in range(5, 0, -1)]) % p
+
+        mod_inv1 = modular_inverse(p - 2, p)
+        mod_inv2 = modular_inverse(p - 3, p)
+        mod_inv3 = modular_inverse(p - 4, p)
+        return (mod_inv1 * ( 1 + mod_inv2 * (1 + mod_inv3))) % p
 
 def main(limit: int):
 
@@ -28,11 +43,7 @@ def main(limit: int):
 
     s = 0
     for p in primes:
-        print(p, (factorial(p - 1) + 1) % p)
-        print(p, (factorial(p - 2)) % p)
-        print(p, (factorial(p - 3)) % p)
-        print()
-        time.sleep(1)
+        s += expression(p)
     print(s)
 
 if __name__=='__main__':

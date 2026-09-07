@@ -5,6 +5,8 @@ def digitsum(n: int):
     return sum([int(char) for char in str(n)])
 
 def isprime(n: int):
+    if n <= 1:
+        return False
     for m in range(2, math.isqrt(n) + 1):
         if n % m == 0:
             return False

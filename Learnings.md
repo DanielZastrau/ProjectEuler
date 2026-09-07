@@ -1,0 +1,4 @@
+- Diophantine equations
+- Extended Euler Algorithm for gcd and Bézouts identity ax + by = gcd(a, b)
+- Right-Left Pointers
+- Efficient prime sieves

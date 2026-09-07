@@ -10,8 +10,9 @@ from typing import Iterator
 import commons
 
 def inner_collatz(number: int) -> int:
-    if number % 2 == 0: return number // 2
-    elif number % 2 == 1: return (number * 3) + 1
+    if number % 2 == 0:
+        return number // 2
+    return (number * 3) + 1
 
 def outer_collatz(SL: list[int], number: int) -> int:
     sequence_length = 1
@@ -26,7 +27,7 @@ def main():
     max_sl = float('-inf')
     max_int = 0
     SL: list[int] = [0,1]
-    for integer in range(2,1000000):
+    for integer in range(2, 1_000_000):
         sl = outer_collatz(SL, integer)
         SL.append(sl)
         if sl > max_sl: 
