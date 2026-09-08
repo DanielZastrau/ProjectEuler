@@ -1,3 +1,17 @@
+"""https://projecteuler.net/problem=13
+"""
+
+import argparse
+import time
+import math
+import itertools as it
+import functools as ft
+import operator as op
+
+from typing import Iterator
+
+import commons
+
 string = '''37107287533902102798797998220837590246510135740250
 46376937677490009712648124896970078050417018260538
 74324986199524741059474233309513058123726617309629
@@ -99,10 +113,22 @@ string = '''37107287533902102798797998220837590246510135740250
 20849603980134001723930671666823555245252804609722
 53503534226472524250874054075591789781264330331690'''
 
-string_stripped = string.strip()
-string_splitted = string_stripped.split('\n')
-Digits = []
-for string in string_splitted:
-    Digits.append(int(string))
+def main():
+    global string
 
-print(str(sum(Digits))[:10])
+    string_stripped = string.strip()
+    string_splitted = string_stripped.split('\n')
+    Digits: list[int] = []
+    for string in string_splitted:
+        Digits.append(int(string))
+
+    print(str(sum(Digits))[:10])
+
+if __name__=='__main__':
+
+    parser = argparse.ArgumentParser()
+    args = parser.parse_args()
+
+    t = time.time()
+    main()
+    print(time.time() - t)
