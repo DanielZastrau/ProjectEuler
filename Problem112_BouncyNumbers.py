@@ -1,5 +1,16 @@
 """https://projecteuler.net/problem=112"""
 
+import argparse
+import time
+import math
+import itertools as it
+import functools as ft
+import operator as op
+
+from typing import Iterator
+
+import commons
+
 def is_increasing_number(number: int) -> bool:
 
     string = str(number)
@@ -28,18 +39,7 @@ def is_bouncy_number(number: int) -> bool:
         return True
     return False
 
-
-def amount_of_bouncy_numbers_below(number: int) -> int:
-
-    count = 0
-    for n in range(1, number):
-
-        if is_bouncy_number(number=n):
-            count += 1
-    return count
-
-
-def when_does_proportion_of_bouncy_numbers_reach(level: float) -> int:
+def main(level: float):
     """The first integer for which the proportion of bouncy numbers below it, reaches the level.
     50% is specified as 0.5
     """
@@ -52,16 +52,16 @@ def when_does_proportion_of_bouncy_numbers_reach(level: float) -> int:
             count += 1
 
         if count / number == level:
-            return number
-
-        if number % 10000 == 0:
-            answer = input(f'Waiting for approval on continuation. Currently at: {number} -- Enter for continuation / e for end:  ')
-
-            if answer == 'e':
-                return -1
+            print(number)
+            break
 
         number += 1
 
 if __name__=='__main__':
 
-    print(when_does_proportion_of_bouncy_numbers_reach(level=0.99))
+    parser = argparse.ArgumentParser()
+    args = parser.parse_args()
+
+    t = time.time()
+    main(level=0.99)
+    print(time.time() - t)

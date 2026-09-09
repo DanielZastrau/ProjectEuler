@@ -1,36 +1,47 @@
-"""
-https://projecteuler.net/problem=46
+"""https://projecteuler.net/problem=46
 """
 
+import argparse
+import time
 import math
+import itertools as it
+import functools as ft
+import operator as op
 
-def prime(num):
-    for i in range(2, int(math.sqrt(num)) + 1):
-        if num%i == 0: return False
+from typing import Iterator
 
-    return True
+import commons
 
-def conjecture(num):
-    Primes = []
-    for i in range(2, num):
-        if prime(i):
-            Primes.append(i)
-    # print(f'{num}: {Primes}')
-    
-    for prime_ in Primes:
-        # print(f'num - prime_: {num - prime_}')
-        # print(f'(num - prime_) / 2: {(num - prime_) / 2}')
-        if math.sqrt((num - prime_) / 2)%1 == 0:
+def expression(prime: int, j: int) -> int:
+    return prime + 2 * j**2
+
+def find_j(prime: int, num: int) -> int:
+    for j in range(math.isqrt(num)):
+        if expression(prime, j) >= num:
+            return j
+    return j
+
+def conjecture(num: int, primes: list[int]):
+    for prime in primes:
+        if prime > num:
+            return False
+        if expression(prime, find_j(prime, num)) == num:
             return True
-    
     return False
 
 def main():
-    next_ = 3
-    
-    while True:
-        next_ = next_ + 2
-        if not prime(next_) and not conjecture(next_):
-            return next_
+    primes = commons.eratosthenes(limit=10000)
 
-print(main())
+    for n in range(3, 10000, 2):
+        if not commons.isprime(n) and not conjecture(n, primes):
+            print(n)
+            break
+
+if __name__=='__main__':
+
+    parser = argparse.ArgumentParser()
+    args = parser.parse_args()
+
+    t = time.time()
+    main()
+    print(time.time() - t)

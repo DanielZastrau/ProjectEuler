@@ -2,19 +2,25 @@
 https://projecteuler.net/problem=55
 """
 
-def reverse(num):
-    return int( ''.join( reversed( [ elem for elem in str(num) ] )))
+import argparse
+import time
+import math
+import itertools as it
+import functools as ft
+import operator as op
 
-def palindrome(num):
-    string = str(num)
+from typing import Iterator
 
-    for index in range(len(string) // 2):
-        if string[index] != string[-(index + 1)]:
-            return False
-    return True
+import commons
 
-def lychrel(num):
-    for iteration in range(50):
+def reverse(num: int):
+    return int(''.join(str(num)[::-1]))
+
+def palindrome(num: int):
+    return str(num) == str(num)[::-1]
+
+def lychrel(num: int):
+    for _ in range(50):
         num = num + reverse(num)
 
         if palindrome(num):
@@ -28,4 +34,11 @@ def main():
             c += 1
     return c
 
-print(main())
+if __name__=='__main__':
+
+    parser = argparse.ArgumentParser()
+    args = parser.parse_args()
+
+    t = time.time()
+    main()
+    print(time.time() - t)
