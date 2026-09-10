@@ -12,51 +12,59 @@ from typing import Iterator
 
 import commons
 
-def count_increasing_numbers_below(total_count: int, remaining_digits: list[int],
-                                  remaining_places: int):
-    """The assumption is simply that limit is of the form 10**x.
-    I.e. it poses a number of digits."""
+def main3(limit: int = 10**100):
+    """https://oeis.org/A152054"""
+    pass
+
+def amount_increasing_numbers(total_count: int, remaining_digits: range,
+                              remaining_places: int) -> int:
 
     for n in remaining_digits:
         total_count += 1
-        remaining_places -= 1
 
-        if remaining_places > 0:
-            total_count = count_increasing_numbers_below(total_count=total_count,
-                                                          remaining_digits=list(range(n, 10)),
-                                                          remaining_places=remaining_places)
+        if remaining_places - 1 > 0:
+            total_count = amount_increasing_numbers(total_count=total_count,
+                                                    remaining_digits=range(n, 10),
+                                                    remaining_places=remaining_places - 1)
 
     return total_count
 
-
-def count_decreasing_numbers_below(total_count: int, remaining_digits: list[int],
-                                  remaining_places: int):
-    """The assumption is simply that limit is of the form 10**x.
-    I.e. it poses a number of digits."""
-
+def amount_decreasing_numbers(total_count: int, remaining_digits: range,
+                              remaining_places: int) -> int:
     for n in remaining_digits:
         total_count += 1
-        remaining_places -= 1
 
-        if remaining_places > 0:
-            total_count = count_decreasing_numbers_below(total_count=total_count,
-                                                            remaining_digits=list(range(n, -1, -1)),
-                                                            remaining_places=remaining_places)
+        if remaining_places - 1 > 0:
+            total_count = amount_decreasing_numbers(total_count=total_count,
+                                                    remaining_digits=range(n, -1, -1),
+                                                    remaining_places=remaining_places - 1)
+    return total_count
 
+def amount_inc_and_dec(total_count: int, remaining_digits: range,
+                       remaining_places: int) -> int:
+    for n in remaining_digits:
+        total_count += 1
+
+        if remaining_places - 1 > 0:
+            total_count = amount_inc_and_dec(total_count=total_count,
+                                             remaining_digits=range(n, n + 1),
+                                             remaining_places=remaining_places - 1)
     return total_count
 
 def main(limit: int = 10**100):
-
+    """10**24 takes 41 seconds"""
+    
     digital_places = int(math.log10(limit))
-    count_of_increasing_numbers = count_increasing_numbers_below(total_count=0,
-                                                                remaining_places=digital_places,
-                                                                remaining_digits=list(range(1, 10)))
-    count_of_decreasing_numbers = count_decreasing_numbers_below(total_count=0,
-                                                                 remaining_places=digital_places,
-                                                                 remaining_digits=list(range(9, 0, -1)))
-    # both count constant digits like 1111111.... or 99999999.... these we have to substract
-    total_count = count_of_increasing_numbers + count_of_decreasing_numbers - 9
-    print(total_count)
+    amount1 = amount_increasing_numbers(total_count=0,
+                                        remaining_digits=range(1, 10),
+                                        remaining_places=digital_places)
+    amount2 = amount_decreasing_numbers(total_count=0,
+                                        remaining_digits=range(9, 0, -1),
+                                        remaining_places=digital_places)
+    amount3 = amount_inc_and_dec(total_count=0, remaining_digits=range(1, 10),
+                                 remaining_places=digital_places)
+    print(amount1 + amount2 - amount3)
+
 
 def main_naive(limit: int):
     """unsuprisingly this works correctly, but is way too slow"""
@@ -83,7 +91,6 @@ def main_naive(limit: int):
     
     count = 0
     for n in range(1, limit):
-        print(n)
         d = digits(n)
         if (isincreasing(d) or isdecreasing(d)):
             count += 1
@@ -92,9 +99,13 @@ def main_naive(limit: int):
 if __name__=='__main__':
 
     parser = argparse.ArgumentParser()
+    parser.add_argument('--which', type=int, default=0)
     parser.add_argument('--limit', type=int, default=10**100)
     args = parser.parse_args()
 
     t = time.time()
-    main(limit=args.limit)
+    if args.which == 0:
+        main(limit=args.limit)
+    elif args.which == 1:
+        main_naive(limit=args.limit)
     print(time.time() - t)

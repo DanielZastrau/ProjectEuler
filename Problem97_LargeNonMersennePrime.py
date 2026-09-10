@@ -13,13 +13,13 @@ if __name__=="__main__":
     p = 1
     for _ in range(7830457):    # 7830457
         p *= 2
-        if p > const:
-            p -= const
+        p = p % const
 
     s = 0
     for _ in range(28433):    # 28433
         s += p
+        s = s % const
     s += 1
 
-    print(str(s)[-10:])
+    print(s)
     print(time() - t)
