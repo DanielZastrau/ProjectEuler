@@ -1,15 +1,19 @@
-#value of the first triangle number with over 500 divisiors
-#x-th triangle number is the sum of the first x positive integers
-import math
+"""https://projecteuler.net/problem=12
+"""
+
+import argparse
 import time
+import math
+import itertools as it
+import functools as ft
+import operator as op
 
-TN = [1]
+from typing import Iterator
 
-def get_next_number():
-    integer = len(TN) + 1
-    TN.append(TN[-1] + integer)
+import commons
 
-def get_number_of_divisors(number):
+
+def get_number_of_divisors(number: int):
     integer = 1
     count = 0
     while integer < math.sqrt(number):
@@ -22,10 +26,22 @@ def get_number_of_divisors(number):
 
     return count
 
-while True:
-    get_next_number()
-    number = get_number_of_divisors(TN[-1])
+def main():
 
-    if number > 500:
-        print(TN[-1])
-        break
+    n = 0    
+    for m in range(1, 10**8):
+        n += m
+        number = get_number_of_divisors(n)
+
+        if number > 500:
+            print(n)
+            break
+
+if __name__=='__main__':
+
+    parser = argparse.ArgumentParser()
+    args = parser.parse_args()
+
+    t = time.time()
+    main()
+    print(time.time() - t)

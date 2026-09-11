@@ -12,59 +12,25 @@ from typing import Iterator
 
 import commons
 
-def main3(limit: int = 10**100):
-    """https://oeis.org/A152054"""
-    pass
+def binomial(n: int, m: int) -> int:
+    return math.factorial(n) // (math.factorial(n - m) * math.factorial(m))
 
-def amount_increasing_numbers(total_count: int, remaining_digits: range,
-                              remaining_places: int) -> int:
+def n_digit_bouncy_numbers(digital_places: int) -> int:
+    first_summand: int = 9 * 10**(digital_places - 1)
+    second_summand: int = ((digital_places + 18) * binomial(digital_places + 8, 8) // 9)
 
-    for n in remaining_digits:
-        total_count += 1
-
-        if remaining_places - 1 > 0:
-            total_count = amount_increasing_numbers(total_count=total_count,
-                                                    remaining_digits=range(n, 10),
-                                                    remaining_places=remaining_places - 1)
-
-    return total_count
-
-def amount_decreasing_numbers(total_count: int, remaining_digits: range,
-                              remaining_places: int) -> int:
-    for n in remaining_digits:
-        total_count += 1
-
-        if remaining_places - 1 > 0:
-            total_count = amount_decreasing_numbers(total_count=total_count,
-                                                    remaining_digits=range(n, -1, -1),
-                                                    remaining_places=remaining_places - 1)
-    return total_count
-
-def amount_inc_and_dec(total_count: int, remaining_digits: range,
-                       remaining_places: int) -> int:
-    for n in remaining_digits:
-        total_count += 1
-
-        if remaining_places - 1 > 0:
-            total_count = amount_inc_and_dec(total_count=total_count,
-                                             remaining_digits=range(n, n + 1),
-                                             remaining_places=remaining_places - 1)
-    return total_count
+    return first_summand - second_summand + 10
 
 def main(limit: int = 10**100):
-    """10**24 takes 41 seconds"""
-    
-    digital_places = int(math.log10(limit))
-    amount1 = amount_increasing_numbers(total_count=0,
-                                        remaining_digits=range(1, 10),
-                                        remaining_places=digital_places)
-    amount2 = amount_decreasing_numbers(total_count=0,
-                                        remaining_digits=range(9, 0, -1),
-                                        remaining_places=digital_places)
-    amount3 = amount_inc_and_dec(total_count=0, remaining_digits=range(1, 10),
-                                 remaining_places=digital_places)
-    print(amount1 + amount2 - amount3)
+    """https://oeis.org/A152054"""
 
+    digital_places = int(math.log10(limit))
+    amount_non_bouncy_numbers = 0
+    for number_digits in range(1, digital_places + 1):
+        amount_n_digit_bouncy_numbers = n_digit_bouncy_numbers(number_digits)
+        n_digit_numbers = 10**number_digits - 10**(number_digits - 1)
+        amount_non_bouncy_numbers += n_digit_numbers - amount_n_digit_bouncy_numbers
+    print(amount_non_bouncy_numbers)
 
 def main_naive(limit: int):
     """unsuprisingly this works correctly, but is way too slow"""

@@ -1,4 +1,16 @@
-#greatest product of 4 adjacent integers in any direction
+"""https://projecteuler.net/problem=11
+"""
+
+import argparse
+import time
+import math
+import itertools as it
+import functools as ft
+import operator as op
+
+from typing import Iterator
+
+import commons
 
 string = """
 08 02 22 97 38 15 00 40 00 75 04 05 07 78 52 12 50 77 91 08
@@ -22,54 +34,62 @@ string = """
 20 73 35 29 78 31 90 01 74 31 49 71 48 86 81 16 23 57 05 54
 01 70 54 71 83 51 54 69 16 92 33 48 61 43 52 01 89 19 67 48
 """
-Matrix = []
-for i in range(20):
-    Matrix.append([ int(string.strip().split()[j]) for j in range(i*20, (i+1)*20) ])
 
-for row in Matrix:
-    print(row)
+def main():
+    Matrix = []
+    for i in range(20):
+        Matrix.append([ int(string.strip().split()[j]) for j in range(i*20, (i+1)*20) ])
 
-HProducts = []
+    HProducts = []
 
-product = 1
-for row_index in range(len(Matrix)):
-    for column_index in range(len(Matrix[row_index]) - 3):
-        for product_index in range(4):
-            product = product * Matrix[row_index][column_index + product_index]
-        HProducts.append(product)
-        product = 1
+    product = 1
+    for row_index in range(len(Matrix)):
+        for column_index in range(len(Matrix[row_index]) - 3):
+            for product_index in range(4):
+                product = product * Matrix[row_index][column_index + product_index]
+            HProducts.append(product)
+            product = 1
+            break
         break
-    break
 
-VProducts = []
+    VProducts = []
 
-product = 1
-for row_index in range(len(Matrix) - 3):
-    for column_index in range(len(Matrix[row_index])):
-        for product_index in range(4):
-            product = product * Matrix[row_index + product_index][column_index]
-        VProducts.append(product)
-        product = 1
+    product = 1
+    for row_index in range(len(Matrix) - 3):
+        for column_index in range(len(Matrix[row_index])):
+            for product_index in range(4):
+                product = product * Matrix[row_index + product_index][column_index]
+            VProducts.append(product)
+            product = 1
 
-DProducts1 = []
+    DProducts1 = []
 
-product = 1
-for row_index in range(len(Matrix) - 3):
-    for column_index in range(len(Matrix[row_index]) - 3):
-        for product_index in range(4):
-            product = product * Matrix[row_index + product_index][column_index + product_index]
-        DProducts1.append(product)
-        product = 1
+    product = 1
+    for row_index in range(len(Matrix) - 3):
+        for column_index in range(len(Matrix[row_index]) - 3):
+            for product_index in range(4):
+                product = product * Matrix[row_index + product_index][column_index + product_index]
+            DProducts1.append(product)
+            product = 1
 
-DProducts2 = []
+    DProducts2 = []
 
-product = 1
-for row_index in range(len(Matrix) - 3):
-    for column_index in range(3, len(Matrix[row_index])):
-        for product_index in range(4):
-            product = product * Matrix[row_index + product_index][column_index - product_index]
-        DProducts2.append(product)
-        product = 1
+    product = 1
+    for row_index in range(len(Matrix) - 3):
+        for column_index in range(3, len(Matrix[row_index])):
+            for product_index in range(4):
+                product = product * Matrix[row_index + product_index][column_index - product_index]
+            DProducts2.append(product)
+            product = 1
 
-maximum = max(max(HProducts), max(VProducts), max(DProducts2), max(DProducts1))
-print(maximum)
+    maximum = max(max(HProducts), max(VProducts), max(DProducts2), max(DProducts1))
+    print(maximum)
+
+if __name__=='__main__':
+
+    parser = argparse.ArgumentParser()
+    args = parser.parse_args()
+
+    t = time.time()
+    main()
+    print(time.time() - t)
