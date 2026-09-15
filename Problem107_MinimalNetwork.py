@@ -1,6 +1,6 @@
 """https://projecteuler.net/problem=107
 Sep 26
-259679  16ms
+259679  2ms
 """
 
 import argparse
@@ -37,33 +37,35 @@ def main(test: bool):
     else:
         matrix = test_matrix()
 
+    n = len(matrix)
     total_edge_weight = sum([sum(row) for row in matrix]) // 2
-    print(total_edge_weight)
 
     mst: list[list[int]] =  [[0 for _ in row] for row in matrix]
     tree_nodes = [0]
+    visited = [False] * n
+    visited[0] = True
 
-    while len(tree_nodes) != len(matrix):
-        minimum_edge_weight = 10**10
-        corresp_source_node = -1
-        corresp_target_node = -1
+    # (weight, source, target)
+    heap: list[tuple[int, int, int]] = []
+    for target_node, weight in enumerate(matrix[0]):
+        if weight > 0:
+            heapq.heappush(heap, (weight, 0, target_node))
 
-        for source_node in tree_nodes:
-            for target_node in range(len(matrix[source_node])):
-                if target_node in tree_nodes:
-                    continue
+    while heap and len(tree_nodes) < n:
 
-                if matrix[source_node][target_node] == 0:
-                    continue
+        weight, source, target = heapq.heappop(heap)
+        print(weight, source, target)
+        if visited[target]:
+            continue
 
-                if matrix[source_node][target_node] < minimum_edge_weight:
-                    minimum_edge_weight = matrix[source_node][target_node]
-                    corresp_source_node = source_node
-                    corresp_target_node = target_node
+        mst[source][target] = weight
+        mst[target][source] = weight
+        tree_nodes.append(target)
+        visited[target] = True
 
-        mst[corresp_source_node][corresp_target_node] = minimum_edge_weight
-        mst[corresp_target_node][corresp_source_node] = minimum_edge_weight
-        tree_nodes.append(corresp_target_node)
+        for next_target, weight in enumerate(matrix[target]):
+            if weight > 0 and not visited[next_target]:
+                heapq.heappush(heap, (weight, target, next_target))
 
     print('\n'.join([str(row) for row in mst]))
     print(tree_nodes)
