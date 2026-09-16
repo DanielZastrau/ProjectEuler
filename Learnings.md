@@ -1,10 +1,11 @@
-*Number Theory*
-- Diophantine equations
-- Extended Euler Algorithm for gcd and Bézouts identity ax + by = gcd(a, b)
-
 *Programming Techniques*
 - Right-Left Pointers
 - Efficient prime sieves
+- Memoization  (Space-Time Tradeoff)
+
+*Number Theory*
+- Diophantine equations
+- Extended Euler Algorithm for gcd and Bézouts identity ax + by = gcd(a, b)
 
 *Numerics*
 - Implemented Lagrangian Interpolation
