@@ -1,10 +1,11 @@
 """https://projecteuler.net/problem=191
 Sep 26
 
-limit=26 with dfs 58s
+limit=26 with dfs 45s
+limit=30 with dfs 823s
 
-Want to try something akin to the tiling problem. I.e. how many ways are there to tile a block
-of 3 or more a's into a string of lenght 30. And the same for the l's."""
+what would I tag this problem as?
+  -  combinatorics"""
 
 import argparse
 import time
@@ -19,30 +20,31 @@ from typing import Iterator
 
 import commons
 
-def recursion_dfs(count: int, curr_str: str, depth: int, limit: int,
-                  l_count: int, consec_a_count: int) -> int:
+@ft.cache
+def recursion_dfs(rest: int, l_count: int, consec_a_count: int) -> int:
+    global count
 
-    if l_count == 2:
-        return count
+    if l_count == 2 or consec_a_count == 3:
+        return 0
 
-    if consec_a_count == 3:
-        return count
+    if rest == 0:
+        return 1
 
-    if depth == limit:
-        return count + 1
-
-    count = recursion_dfs(count=count, curr_str=curr_str + 'o', depth=depth + 1, limit=limit,
-                            l_count=l_count, consec_a_count=0)
-    count = recursion_dfs(count=count, curr_str=curr_str + 'a', depth=depth + 1, limit=limit,
-                            l_count=l_count, consec_a_count=consec_a_count + 1)
-    count = recursion_dfs(count=count, curr_str=curr_str + 'l', depth=depth + 1, limit=limit,
-                            l_count=l_count + 1, consec_a_count=0)
-    
-    return count
+    return (
+        recursion_dfs(rest=rest - 1, l_count=l_count, consec_a_count=0) +
+        recursion_dfs(rest=rest - 1, l_count=l_count, consec_a_count=consec_a_count + 1) +
+        recursion_dfs(rest=rest - 1, l_count=l_count + 1, consec_a_count=0)
+    )
 
 def main(limit: int):
 
-    print(recursion_dfs(0, '', 0, limit, 0, 0))
+    # total=func(30,0,0)
+    # print ("Total: %d"%total)
+
+    global count
+
+    print(recursion_dfs(limit, 0, 0))
+    print(recursion_dfs.cache_info())
 
 if __name__=='__main__':
 
