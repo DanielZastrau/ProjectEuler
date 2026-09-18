@@ -40,8 +40,10 @@ def combination_to_tiles(limit: int):
 
         for inner_sq_base in range(start, outer_sq_base, 2):
 
-            key = f'{outer_sq_base} {inner_sq_base}'
-            d[key] = outer_sq_base**2 - inner_sq_base**2
+            val = outer_sq_base**2 - inner_sq_base**2
+            if val <= limit:
+                key = f'{outer_sq_base} {inner_sq_base}'
+                d[key] = val
 
     return d
 
@@ -67,13 +69,17 @@ def count_L(tile_count: dict[int, int]) -> dict[int, int]:
 
 def main(limit: int):
 
+    # outer square inner square -> amount of tiles used (t)
     outer_inner_to_tiles = combination_to_tiles(limit)
-    print(time.time() - t)
-    tile_count = count_tiles(outer_inner_to_tiles)
-    print(time.time() - t)
-    L_count = count_L(tile_count)
-    print(time.time() - t)
-    print(sum([L_count[n] for n in range(1, 11)]))
+
+    # amount of tiles used (t) -> how many combinations of outer sq inner sq can be made with it
+    tile_counts = count_tiles(outer_inner_to_tiles)
+
+    # N(n) -> amount of t such that exactly n combinations can be made with it
+    N_of_n = count_L(tile_counts)
+
+    # the sum o
+    print(sum([N_of_n[n] for n in range(1, 11)]))
 
 if __name__=='__main__':
 
