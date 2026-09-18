@@ -1,5 +1,7 @@
 """https://projecteuler.net/problem=173
-Sep 26"""
+Sep 26
+
+0.0998 sec"""
 
 import argparse
 import time
@@ -26,6 +28,8 @@ def main(limit: int):
             start = last_start_even
         else:
             start = last_start_odd
+
+        
 
         for m in range(start, n, 2):
 

@@ -38,11 +38,6 @@ def recursion_dfs(rest: int, l_count: int, consec_a_count: int) -> int:
 
 def main(limit: int):
 
-    # total=func(30,0,0)
-    # print ("Total: %d"%total)
-
-    global count
-
     print(recursion_dfs(limit, 0, 0))
     print(recursion_dfs.cache_info())
 
