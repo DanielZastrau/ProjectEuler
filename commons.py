@@ -30,36 +30,26 @@ def eratosthenes(limit: int) -> list[int]:
             
     return [index for index in range(2, len(numbers)) if numbers[index]]
 
-def atkin(limit: int) -> list[int]:
-    """That thing is painfully slow. Need to optimize it in the future to run on more low-level
-    CPython-native operations."""
+def prime_factorization_sieve(limit: int) -> list[list[int]]:
 
-    primes: list[int] = [2, 3]
-    sieve = [False] * (limit + 1)
+    numbers: list[list[int]] = [[] for _ in range(limit + 1)]
+    numbers[1] = [1]
+    for n in range(2, limit + 1):
+        if not numbers[n]:
+            for nn in range(n, limit + 1, n):
 
-    for x in range(1, int(math.sqrt(limit)) + 1):
-        for y in range(1, int(math.sqrt(limit)) + 1):
+                power = 0
+                while nn % pow(n, power + 1) == 0:
+                    power += 1
+                numbers[nn].extend([n] * power)
+            
+    return numbers
 
-            n = 4 * x**2 + y**2
-            if n <= limit and (n % 12 == 1 or n % 12 == 5):
-                sieve[n] = not sieve[n]
+def prime_factorization_of_int(n: int) -> list[int]:
 
-            n = 3 * x**2 + y**2
-            if n <= limit and n % 12 == 7:
-                sieve[n] = not sieve[n]
-
-            n = 3 * x**2 - y**2
-            if x > y and n <= limit and n % 12 == 11:
-                sieve[n] = not sieve[n]
-
-
-    for x in range(5, int(math.sqrt(limit))):
-        if sieve[x]:
-            for y in range(x**2, limit + 1, x**2):
-                sieve[y] = False
-
-    for p in range(5, limit):
-        if sieve[p]:
-            primes.append(p)
-
-    return primes
+    primes = eratosthenes(limit= n// 2 + 1)
+    prime_factors: list[int] = []
+    for prime in primes:
+        if n % prime:
+            prime_factors.append(prime)
+    return prime_factors

@@ -1,20 +1,40 @@
-cents = 200
-denominations = [200, 100, 50, 20, 10, 5, 2, 1]
-counts = {200 : "", 100 : "", 50 : "", 20 : "", 10 : "", 5 : "", 2 : "", 1: ""}
+"""https://projecteuler.net/problem=31
+"""
 
-def count_combs(total, i, comb, add):
-    if add:
-        comb.append(add)
-    if total == 0 or (i+1) == len(denominations):
-        if (i+1) == len(denominations) and total > 0:
-            comb.append( (total, denominations[i]) )
-            i += 1
-        while i < len(denominations):
-            comb.append( (0, denominations[i]) )
-            i += 1
-        print (" ".join("%d %s" % (n,counts[c]) for (n,c) in comb))
-        return 1
-    cur = denominations[i]
-    return sum(count_combs(total-x*cur, i+1, comb[:], (x,cur)) for x in range(0, int(total/cur)+1))
+import argparse
+import time
+import math
+import itertools as it
+import functools as ft
+import operator as op
+import fractions as fr
+import heapq
 
-print(count_combs(cents, 0, [], None))
+from typing import Iterator
+
+import commons
+
+def dp(target: int, coins: list[int]) -> int:
+
+    ways = [0] * (target + 1)
+    ways[0] = 1
+
+    for coin in coins:
+        for amount in range(coin, target + 1):
+            ways[amount] += ways[amount - coin]
+
+    return ways[target]
+
+def main():
+    coins = [1, 2, 5, 10, 20, 50, 100, 200]
+    target = 200
+    print(dp(target, coins))
+
+if __name__=='__main__':
+
+    parser = argparse.ArgumentParser()
+    args = parser.parse_args()
+
+    t = time.time()
+    main()
+    print(time.time() - t)
