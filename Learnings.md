@@ -13,9 +13,16 @@
 
 *Number Theory*
 - Diophantine equations
+- Bézouts identity
+    - Let a and b be integers with gcd d. Then there exist integers x and y such that ax + by = d.
+        Moreover, the integers of the form az + bt are multiples of d.
 - Extended Euler Algorithm for gcd and Bézouts identity ax + by = gcd(a, b)
+- Chinese Remainder Theorem
 - Legendre's Formula
     - gives the largest power of a prime that divides a factorial
+- N-Smooth numbers
+    - numbers with no prime factor greater than N
+    - apparently a topic within cryptography
 
 *Numerics*
 - Lagrangian Interpolation

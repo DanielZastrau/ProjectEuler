@@ -53,3 +53,26 @@ def prime_factorization_of_int(n: int) -> list[int]:
         if n % prime:
             prime_factors.append(prime)
     return prime_factors
+
+def extended_euclidean_algorithm(a: int, b: int) -> tuple[int, int, int, int, int]:
+    """computes the bezout coefficients for integers a and b:    ax + by = gcd(a, b)
+    args:    a    integer
+             b    integer
+    returns: tuple
+                bezout coefficients x and y in places 0 and 1
+                gcd d in place 2
+                quotients by the gcd of a and b in places 3 and 4
+    """
+
+    old_r, r = a, b
+    old_s, s = 1, 0
+    old_t, t = 0, 1
+
+    while r != 0:
+        q = old_r // r
+
+        old_r, r = r, old_r - q * r
+        old_s, s = s, old_s - q * s
+        old_t, t = t, old_t - q * t
+
+    return old_s, old_t, old_r, t, s
